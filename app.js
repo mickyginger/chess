@@ -1,3 +1,4 @@
+// Generic piece class
 class Piece {
   constructor(color, movement, restricted) {
     this.color = color;
@@ -6,6 +7,7 @@ class Piece {
   }
 }
 
+// Specfic pieces
 class Pawn extends Piece {
   constructor(color) {
     super(color, [
@@ -84,6 +86,7 @@ class King extends Piece {
   }
 }
 
+// Board class
 class Board {
   constructor() {
     this.squares = [];
@@ -92,6 +95,7 @@ class Board {
     this.player = 'white';
   }
 
+  // Generate squres, each square is an object containing row, col and color
   generateSquares() {
     let i = 0, row = 0, col = 0, color = 'white';
     while(i < 64) {
@@ -105,6 +109,7 @@ class Board {
     }
   }
 
+  // Assign pieces to starting position on correct squares
   assignPieces() {
     this.squares = this.squares.map(square => {
       // pawns
@@ -145,8 +150,10 @@ class Board {
     });
   }
 
-  canMove(squareFrom, squareTo) {
-    if(!squareFrom.piece || squareFrom.piece.color !== this.player) return false;
+  // check if piece on squareFrom can move to squareTo from perspective of player
+  canMove(squareFrom, squareTo, player=this.player) {
+
+    if(!squareFrom.piece || squareFrom.piece.color !== player) return false;
     const indexFrom = this.squares.indexOf(squareFrom);
     const indexTo = this.squares.indexOf(squareTo);
     // if movement is unrestricted keep going until we reach the edge of the board or a piece of the same color
@@ -190,17 +197,15 @@ class Board {
     return !squareTo.piece || squareTo.piece.color !== squareFrom.piece.color;
   }
 
+  // move the piece from square with indexFrom to square with indexTo
   move(indexFrom, indexTo) {
-    console.log(`${this.player}'s move`);
-
     const squareFrom = this.squares[indexFrom];
     const squareTo = this.squares[indexTo];
 
     const playerInCheck = this.isPlayerInCheck();
-    console.log(`${this.player} is in check:`, playerInCheck);
 
     if(!this.canMove(squareFrom, squareTo)) return false;
-    console.log('can move');
+
     if(squareFrom.piece instanceof Pawn && squareFrom.piece.movement.length === 2){
       squareFrom.piece.movement.pop();
     }
@@ -208,25 +213,20 @@ class Board {
     squareTo.piece = squareFrom.piece;
     delete squareFrom.piece;
 
-    console.log('move successful');
     if(playerInCheck && this.isPlayerInCheck()) {
       // player is still in check, so undo the move
-      console.log(`${this.player} is in check:`, playerInCheck);
       squareFrom.piece = squareTo.piece;
       delete squareTo.piece;
-      console.log('reverting last move');
       return false;
     }
 
     this.player = this.player === 'white' ? 'black' : 'white';
-    console.log(`${this.player} is in check:`, this.isPlayerInCheck());
-    console.log('===========================================');
     return true;
   }
 
-  // TODO cannot detect check yet... this.canMove is false when bishop CAN move to king square
+  // check if player is in check
+  // used to check whether player is in check at the start of their move
   isPlayerInCheck() {
-    console.log('isPlayerInCheck', this.player);
     // get all the opponent's pieces
     const opponentSquares = this.squares.reduce((squares, square) => {
       if(square.piece && square.piece.color !== this.player) return squares.concat(square);
@@ -238,25 +238,21 @@ class Board {
       return square.piece instanceof King && square.piece.color === this.player;
     });
 
-    console.log(kingSquare);
-
     // check if any of the pieces can move to the king's square
-    return opponentSquares.some(square => this.canMove(square, kingSquare));
+    return opponentSquares.some(square => this.canMove(square, kingSquare, square.piece.color));
   }
 }
 
+// initialize board
 const board = new Board();
-board.move(11, 27);
-board.move(52, 36);
-board.move(27, 36);
-board.move(61, 25);
-console.log('CAN TAKE KING', board.canMove(board.squares[25], board.squares[4]));
+let indexFrom = null;
+let indexTo = null;
 
-$(() => {
-  let indexFrom = null;
-  let indexTo = null;
+// link game to DOM
+function init() {
   // make the grid
   const $board = $('.board');
+  
   board.squares.forEach(square => {
     const $square = $('<div />', { class: `square ${square.color}` });
     if(square.piece) $square.append($('<i />', {
@@ -267,7 +263,7 @@ $(() => {
 
   const $squares = $board.find('.square');
 
-  $board.on('click', '.square', e => {
+  function movePiece(e) {
     const $square = $(e.currentTarget);
     const $piece = $square.find('.piece');
 
@@ -284,5 +280,9 @@ $(() => {
         $square.append($squares.eq(indexFrom).find('.piece'));
       }
     }
-  });
-});
+  }
+
+  $board.on('click', '.square', movePiece);
+}
+
+$(init);
