@@ -2,7 +2,9 @@
 
 > An implementation of chess, using JavaScript and jQuery
 
-![Chess](https://user-images.githubusercontent.com/3531085/45269064-fee37a80-b47e-11e8-94fc-fdc8c1dd92cd.png)
+<div style="text-align:center">
+  <img src="https://user-images.githubusercontent.com/3531085/45269077-4ff36e80-b47f-11e8-8891-9d75ec201c5b.png" style="box-shadow:0 2px 25px 0">
+</div>
 
 ## Approach
 
