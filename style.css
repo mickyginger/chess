@@ -1,0 +1,52 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  padding: 0;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.board {
+  width: 640px;
+  height: 640px;
+
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.board .square {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  cursor: pointer;
+  font-size: 34px;
+}
+
+.square.black {
+  background-color: black;
+}
+
+.square.white {
+  background-color: white;
+}
+
+.piece {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.fas.white {
+  color: white;
+  -webkit-text-stroke: 1px black;
+}
+
+.fas.black {
+  color: black;
+  -webkit-text-stroke: 1px white;
+}
