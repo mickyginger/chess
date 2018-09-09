@@ -2,7 +2,7 @@
 
 > An implementation of chess, using JavaScript and jQuery
 
----
+![Chess](https://user-images.githubusercontent.com/3531085/45269053-c5127400-b47e-11e8-8068-0442086d8c06.png)
 
 ## Approach
 
