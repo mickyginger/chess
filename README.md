@@ -76,8 +76,9 @@ To decide whether a player is in check, I find all of opponents positions and ch
 The following things have not yet been implemented:
 
 - Check mate
-- [En passant][1]
-- [Promotion][2]
+- [Castling](https://simple.wikipedia.org/wiki/Chess#Castling)
+- [En passant](https://simple.wikipedia.org/wiki/Chess#En_passant)
+- [Promotion](https://simple.wikipedia.org/wiki/Pawn_(chess)#Promotion)
 - Automated tests
 
 ## Contributing
@@ -85,6 +86,3 @@ The following things have not yet been implemented:
 Please fork the repo and make a pull request.
 
 If you'd rather just take the code and develop it please credit me and drop me a link to your repo, I'd love to take a look!
-
-[1]: https://simple.wikipedia.org/wiki/Pawn_(chess)#En_passant
-[2]: https://simple.wikipedia.org/wiki/Pawn_(chess)#Promotion
