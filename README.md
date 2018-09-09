@@ -32,7 +32,7 @@ A restricted piece can only move one square, these pieces are:
 
 To move a restricted piece, I just need to check if the square the piece is moving to is either unoccupied or occupied by an opposition piece.
 
-The edge case is the pawn, whose movement is a little more complex. On its first move the pawn can either move one square or two, and when taking another piece can move diagonally. More on that later.
+The edge case is the pawn, whose movement is a little more complex. On its first move the pawn can either move one square or two, and when taking another piece can move diagonally.
 
 ### Unrestricted movement
 
@@ -42,7 +42,7 @@ An unrestricted piece can move any squares in certain directions, as long as not
 - bishop
 - queen
 
-To move an unrestricted piece I first have to determine in which direction it was moving and check that that direction was valid. Then I check that there are no pieces between the start square and the end square. Finally I run the same checks that I made with the restricted piece.
+To move an unrestricted piece I first have to determine in which direction it was moving and check that that direction is valid. Then I check that there are no pieces between the start square and the end square. Finally I run the same checks that I made with the restricted piece.
 
 ### Validating movement
 
@@ -65,7 +65,7 @@ The movement array for the queen for example looks like this:
 
 This describes a move of one square in any direction.
 
-If the user attempts to move in a different direction, for example a knight's move, then it would be considered an invalid move since the array does not contain an object that describes that movement.
+If the user attempts to move in a different direction, for example a knight's move (`{ row: 1, col: 2 }` for example), then it would be considered an invalid move since the array does not contain an object that describes that movement.
 
 ## Check
 
