@@ -18,6 +18,7 @@ body {
 
   display: flex;
   flex-wrap: wrap;
+  box-shadow: 0 0 50px 0 rgba(0, 0, 0, 0.25);
 }
 
 .board .square {
@@ -25,7 +26,7 @@ body {
   width: 80px;
   height: 80px;
   cursor: pointer;
-  font-size: 34px;
+  font-size: 48px;
   border: 1px solid #601010;
 }
 
@@ -47,8 +48,10 @@ body {
 
 .fas.white {
   color: white;
+  text-shadow: 0px 0px 15px rgba(0, 0, 0, 0.25);
 }
 
 .fas.black {
   color: black;
+  text-shadow: 0px 0px 15px rgba(255, 255, 255, 0.25);
 }
