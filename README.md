@@ -2,9 +2,9 @@
 
 > An implementation of chess, using JavaScript and jQuery
 
-<div style="text-align:center">
-  <img src="https://user-images.githubusercontent.com/3531085/45269077-4ff36e80-b47f-11e8-8891-9d75ec201c5b.png" style="box-shadow:0 2px 25px 0">
-</div>
+<img src="https://user-images.githubusercontent.com/3531085/45269077-4ff36e80-b47f-11e8-8891-9d75ec201c5b.png" style="box-shadow:0 2px 25px 0">
+
+Play online here: https://mickyginger.github.io/chess/
 
 ## Approach
 
