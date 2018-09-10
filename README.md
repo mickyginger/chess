@@ -78,9 +78,9 @@ To decide whether a player is in check, I find all of opponents positions and ch
 The following things have not yet been implemented:
 
 - Check mate
-- [Castling](https://simple.wikipedia.org/wiki/Chess#Castling)
+- ~~[Castling](https://simple.wikipedia.org/wiki/Chess#Castling)~~
 - [En passant](https://simple.wikipedia.org/wiki/Chess#En_passant)
-- [Promotion](https://simple.wikipedia.org/wiki/Pawn_(chess)#Promotion)
+- [Promotion](https://simple.wikipedia.org/wiki/Chess#Promotion)
 - Automated tests
 
 ## Contributing

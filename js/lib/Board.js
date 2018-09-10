@@ -86,6 +86,15 @@ class Board { // eslint-disable-line no-unused-vars
     });
   }
 
+  isCastle(squareFrom, squareTo) {
+    const colDiff = squareTo.col - squareFrom.col;
+    const rowDiff = squareTo.row - squareFrom.row;
+
+    const move = this.findValidMove(squareFrom, rowDiff, colDiff);
+
+    return move && move.isCastling;
+  }
+
   // check if piece on squareFrom can move to squareTo from perspective of player
   canMove(squareFrom, squareTo, player=this.player) {
     if(!squareFrom.piece || squareFrom.piece.color !== player) return false;
@@ -120,6 +129,42 @@ class Board { // eslint-disable-line no-unused-vars
       (!squareTo.piece || squareTo.piece.color !== squareFrom.piece.color);
   }
 
+  castle(kingSquare, rookSquare) {
+    const kingFromIndex = this.squares.indexOf(kingSquare);
+    const rookFromIndex = this.squares.indexOf(rookSquare);
+
+    const direction = rookFromIndex % 8 === 0 ? 1 : -1;
+
+    const kingToIndex = rookFromIndex + direction;
+    const rookToIndex = rookFromIndex + direction * 2;
+
+    if(
+      kingSquare.piece.hasMoved || rookSquare.piece.hasMoved ||
+      !this.pathIsClear(kingFromIndex, kingToIndex, 1) ||
+      !this.pathIsClear(rookFromIndex, rookToIndex, 1)
+    ) {
+      return false;
+    }
+
+    this.squares[kingToIndex].piece = kingSquare.piece;
+    this.squares[rookToIndex].piece = rookSquare.piece;
+    delete kingSquare.piece;
+    delete rookSquare.piece;
+
+    if(this.playerInCheck()) {
+      // player is in check, so undo the move
+      kingSquare.piece = this.squares[kingToIndex].piece;
+      rookSquare.piece = this.squares[rookToIndex].piece;
+      delete this.squares[kingToIndex].piece;
+      delete this.squares[rookToIndex].piece;
+      return false;
+    }
+
+    this.squares[kingToIndex].hasMoved = true;
+    this.squares[rookToIndex].hasMoved = true;
+    return true;
+  }
+
   // move the piece from square with indexFrom to square with indexTo
   move(indexFrom, indexTo) {
     const squareFrom = this.squares[indexFrom];
@@ -127,17 +172,24 @@ class Board { // eslint-disable-line no-unused-vars
 
     if(!this.canMove(squareFrom, squareTo)) return false;
 
-    squareTo.piece = squareFrom.piece;
-    delete squareFrom.piece;
+    if(this.isCastle(squareFrom, squareTo)) {
+      const kingSquare = squareFrom;
+      const rookSquare = this.squares[indexFrom - indexFrom%8 + (indexTo % 8 < 4 ? 0 : 7)];
+      this.castle(kingSquare, rookSquare);
+    } else {
 
-    if(this.playerInCheck()) {
-      // player is in check, so undo the move
-      squareFrom.piece = squareTo.piece;
-      delete squareTo.piece;
-      return false;
+      squareTo.piece = squareFrom.piece;
+      delete squareFrom.piece;
+
+      if(this.playerInCheck()) {
+        // player is in check, so undo the move
+        squareFrom.piece = squareTo.piece;
+        delete squareTo.piece;
+        return false;
+      }
+
+      squareTo.piece.hasMoved = true; // flag that piece has moved
     }
-
-    squareTo.piece.hasMoved = true; // flag that piece has moved
 
     this.player = this.player === 'white' ? 'black' : 'white';
     return true;
