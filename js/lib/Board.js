@@ -2,6 +2,7 @@
 class Board { // eslint-disable-line no-unused-vars
   constructor() {
     this.squares = [];
+    this.moves = [];
     this.generateSquares();
     this.assignPieces();
     this.player = 'white';
@@ -108,7 +109,7 @@ class Board { // eslint-disable-line no-unused-vars
 
     if(move && move.restricted) {
       const attackingMove = squareTo.piece && squareTo.piece.color !== squareFrom.piece.color;
-      if(move.attackingOnly) return attackingMove && move.attackingOnly;
+      if(attackingMove && move.nonAttacking) return false;
       return !!move;
     }
 
