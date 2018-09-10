@@ -1,9 +1,8 @@
 // Generic piece class
 class Piece {
-  constructor(color, movement, restricted) {
+  constructor(color, movement) {
     this.color = color;
     this.movement = movement;
-    if(restricted) this.restricted = restricted;
   }
 }
 
@@ -11,11 +10,11 @@ class Piece {
 class Pawn extends Piece {
   constructor(color) {
     super(color, [
-      { row: color === 'white' ? 1 : -1, col: 0 },
-      { row: color === 'white' ? 1 : -1, col: 1, attackingOnly: true },
-      { row: color === 'white' ? 1 : -1, col: -1, attackingOnly: true },
-      { row: color === 'white' ? 2 : -2, col: 0 }
-    ], true);
+      { row: color === 'white' ? 1 : -1, col: 0, restricted: true },
+      { row: color === 'white' ? 1 : -1, col: 1, attackingOnly: true, restricted: true },
+      { row: color === 'white' ? 1 : -1, col: -1, attackingOnly: true, restricted: true },
+      { row: color === 'white' ? 2 : -2, col: 0, firstMoveOnly: true }
+    ]);
   }
 }
 
@@ -26,22 +25,22 @@ class Rook extends Piece {
       { row: 0, col: -1 },
       { row: 1, col: 0 },
       { row: 0, col: 1 }
-    ], false);
+    ]);
   }
 }
 
 class Knight extends Piece {
   constructor(color) {
     super(color, [
-      { row: -1, col: -2 },
-      { row: -2, col: -1 },
-      { row: -1, col: 2 },
-      { row: -2, col: 1 },
-      { row: 1, col: -2 },
-      { row: 2, col: -1 },
-      { row: 1, col: 2 },
-      { row: 2, col: 1 }
-    ], true);
+      { row: -1, col: -2, restricted: true },
+      { row: -2, col: -1, restricted: true },
+      { row: -1, col: 2, restricted: true },
+      { row: -2, col: 1, restricted: true },
+      { row: 1, col: -2, restricted: true },
+      { row: 2, col: -1, restricted: true },
+      { row: 1, col: 2, restricted: true },
+      { row: 2, col: 1, restricted: true }
+    ]);
   }
 }
 
@@ -52,7 +51,7 @@ class Bishop extends Piece {
       { row: -1, col: 1 },
       { row: 1, col: -1 },
       { row: 1, col: 1 }
-    ], false);
+    ]);
   }
 }
 
@@ -67,22 +66,24 @@ class Queen extends Piece {
       { row: -1, col: 1 },
       { row: 1, col: -1 },
       { row: 1, col: 1 }
-    ], false);
+    ]);
   }
 }
 
 class King extends Piece {
   constructor(color) {
     super(color, [
-      { row: -1, col: 0 },
-      { row: 0, col: -1 },
-      { row: 1, col: 0 },
-      { row: 0, col: 1 },
-      { row: -1, col: -1 },
-      { row: -1, col: 1 },
-      { row: 1, col: -1 },
-      { row: 1, col: 1 }
-    ], true);
+      { row: -1, col: 0, restricted: true },
+      { row: 0, col: -1, restricted: true },
+      { row: 1, col: 0, restricted: true },
+      { row: 0, col: 1, restricted: true },
+      { row: -1, col: -1, restricted: true },
+      { row: -1, col: 1, restricted: true },
+      { row: 1, col: -1, restricted: true },
+      { row: 1, col: 1, restricted: true },
+      { row: 0, col: 2, isCastling: true, firstMoveOnly: true }, // king side castle
+      { row: 0, col: -3, isCastling: true, firstMoveOnly: true } // queen side castle
+    ]);
   }
 }
 
@@ -152,12 +153,10 @@ class Board {
 
   // check if piece on squareFrom can move to squareTo from perspective of player
   canMove(squareFrom, squareTo, player=this.player) {
-
     if(!squareFrom.piece || squareFrom.piece.color !== player) return false;
     const indexFrom = this.squares.indexOf(squareFrom);
     const indexTo = this.squares.indexOf(squareTo);
-    // if movement is unrestricted keep going until we reach the edge of the board or a piece of the same color
-    // get all squares between squareFrom and squareTo
+
     const squaresToCheck = [];
 
     let start = Math.min(indexFrom, indexTo);
@@ -166,20 +165,32 @@ class Board {
     let colDiff = squareTo.col - squareFrom.col;
     let rowDiff = squareTo.row - squareFrom.row;
 
-    if(squareFrom.piece.restricted) {
-      const move = squareFrom.piece.movement.find(movement => movement.row === rowDiff && movement.col === colDiff);
+    let move = squareFrom.piece.movement.find(movement => {
+      if(movement.firstMoveOnly && squareFrom.piece.hasMoved) return false;
+      return movement.row === rowDiff && movement.col === colDiff;
+    });
+
+    if(move && move.restricted) {
       const attackingMove = squareTo.piece && squareTo.piece.color !== squareFrom.piece.color;
-      if(squareFrom.piece instanceof Pawn && move && attackingMove) return move.attackingOnly;
+      if(move.attackingOnly) return attackingMove && move.attackingOnly;
       return !!move;
     }
+
     // check that picece is moving horizontally, vertically or diagonally
     if(![0, -0, 1, -1, Infinity, -Infinity].includes(colDiff / rowDiff)) return false;
 
-    colDiff = colDiff / Math.abs(colDiff) || 0;
     rowDiff = rowDiff / Math.abs(rowDiff) || 0;
+    colDiff = colDiff / Math.abs(colDiff) || 0;
+
+    if(!move || !move.firstMoveOnly) {
+      // re-evaluate move
+      move = squareFrom.piece.movement.find(movement => {
+        return movement.row === rowDiff && movement.col === colDiff;
+      });
+    }
 
     // firstly check that piece could move from one square to the next
-    if(!squareFrom.piece.movement.find(movement => movement.row === rowDiff && movement.col === colDiff)) return false;
+    if(!move) return false;
 
     const indexDiff = Math.abs((rowDiff * 8) + colDiff);
 
@@ -206,10 +217,6 @@ class Board {
 
     if(!this.canMove(squareFrom, squareTo)) return false;
 
-    if(squareFrom.piece instanceof Pawn && squareFrom.piece.movement.length === 2){
-      squareFrom.piece.movement.pop();
-    }
-
     squareTo.piece = squareFrom.piece;
     delete squareFrom.piece;
 
@@ -219,6 +226,8 @@ class Board {
       delete squareTo.piece;
       return false;
     }
+
+    squareTo.piece.hasMoved = true; // flag that piece has moved
 
     this.player = this.player === 'white' ? 'black' : 'white';
     return true;
@@ -245,6 +254,9 @@ class Board {
 
 // initialize board
 const board = new Board();
+board.move(1, 18);
+board.move(48, 40);
+
 let indexFrom = null;
 let indexTo = null;
 let $board = null;
