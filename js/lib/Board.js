@@ -62,24 +62,40 @@ class Board { // eslint-disable-line no-unused-vars
     });
   }
 
+  pathIsClear(indexFrom, indexTo, indexDiff) {
+    let start = Math.min(indexFrom, indexTo);
+    const end = Math.max(indexFrom, indexTo);
+
+    const squaresToCheck = [];
+
+    while(start <= end) {
+      if(![indexFrom, indexTo].includes(start)) {
+        squaresToCheck.push(this.squares[start]);
+      }
+      start+=indexDiff;
+    }
+
+    // check that no squares between start and end are occupied
+    return squaresToCheck.every(square => !square.piece);
+  }
+
+  findValidMove(square, rowDiff, colDiff) {
+    return square.piece.movement.find(movement => {
+      if(movement.firstMoveOnly && square.piece.hasMoved) return false;
+      return movement.row === rowDiff && movement.col === colDiff;
+    });
+  }
+
   // check if piece on squareFrom can move to squareTo from perspective of player
   canMove(squareFrom, squareTo, player=this.player) {
     if(!squareFrom.piece || squareFrom.piece.color !== player) return false;
     const indexFrom = this.squares.indexOf(squareFrom);
     const indexTo = this.squares.indexOf(squareTo);
 
-    const squaresToCheck = [];
-
-    let start = Math.min(indexFrom, indexTo);
-    const end = Math.max(indexFrom, indexTo);
-
     let colDiff = squareTo.col - squareFrom.col;
     let rowDiff = squareTo.row - squareFrom.row;
 
-    let move = squareFrom.piece.movement.find(movement => {
-      if(movement.firstMoveOnly && squareFrom.piece.hasMoved) return false;
-      return movement.row === rowDiff && movement.col === colDiff;
-    });
+    let move = this.findValidMove(squareFrom, rowDiff, colDiff);
 
     if(move && move.restricted) {
       const attackingMove = squareTo.piece && squareTo.piece.color !== squareFrom.piece.color;
@@ -93,30 +109,15 @@ class Board { // eslint-disable-line no-unused-vars
     rowDiff = rowDiff / Math.abs(rowDiff) || 0;
     colDiff = colDiff / Math.abs(colDiff) || 0;
 
-    if(!move || !move.firstMoveOnly) {
-      // re-evaluate move
-      move = squareFrom.piece.movement.find(movement => {
-        return movement.row === rowDiff && movement.col === colDiff;
-      });
-    }
+    if(!move || !move.firstMoveOnly) move = this.findValidMove(squareFrom, rowDiff, colDiff);
 
     // firstly check that piece could move from one square to the next
-    if(!move) return false;
+    if(!move || move.restricted) return false;
 
     const indexDiff = Math.abs((rowDiff * 8) + colDiff);
-
-    while(start <= end) {
-      if(![indexFrom, indexTo].includes(start)) {
-        squaresToCheck.push(this.squares[start]);
-      }
-      start+=indexDiff;
-    }
-
-    // check that no squares between start and end are occupied
-    if(squaresToCheck.some(square => square.piece)) return false;
-
     // check that the end square is unoccupied, or occupied with an opposition piece
-    return !squareTo.piece || squareTo.piece.color !== squareFrom.piece.color;
+    return this.pathIsClear(indexFrom, indexTo, indexDiff) &&
+      (!squareTo.piece || squareTo.piece.color !== squareFrom.piece.color);
   }
 
   // move the piece from square with indexFrom to square with indexTo
@@ -129,7 +130,7 @@ class Board { // eslint-disable-line no-unused-vars
     squareTo.piece = squareFrom.piece;
     delete squareFrom.piece;
 
-    if(this.isPlayerInCheck()) {
+    if(this.playerInCheck()) {
       // player is in check, so undo the move
       squareFrom.piece = squareTo.piece;
       delete squareTo.piece;
@@ -144,7 +145,7 @@ class Board { // eslint-disable-line no-unused-vars
 
   // check if player is in check
   // used to check whether player is in check at the start of their move
-  isPlayerInCheck() {
+  playerInCheck() {
     // get all the opponent's pieces
     const opponentSquares = this.squares.reduce((squares, square) => {
       if(square.piece && square.piece.color !== this.player) return squares.concat(square);
@@ -157,6 +158,8 @@ class Board { // eslint-disable-line no-unused-vars
     });
 
     // check if any of the pieces can move to the king's square
-    return opponentSquares.some(square => this.canMove(square, kingSquare, square.piece.color));
+    return opponentSquares.some(square => {
+      return this.canMove(square, kingSquare, square.piece.color);
+    });
   }
 }
