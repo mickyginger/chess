@@ -80,7 +80,7 @@ The following things have not yet been implemented:
 - Check mate
 - ~~[Castling](https://simple.wikipedia.org/wiki/Chess#Castling)~~
 - [En passant](https://simple.wikipedia.org/wiki/Chess#En_passant)
-- [Promotion](https://simple.wikipedia.org/wiki/Chess#Promotion)
+- ~~[Promotion](https://simple.wikipedia.org/wiki/Chess#Promotion)~~
 - Automated tests
 
 ## Contributing

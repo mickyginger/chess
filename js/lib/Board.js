@@ -189,6 +189,11 @@ class Board { // eslint-disable-line no-unused-vars
       }
 
       squareTo.piece.hasMoved = true; // flag that piece has moved
+
+      // promotion
+      if(squareTo.piece instanceof Pawn && [0,7].includes(squareTo.row)) {
+        squareTo.piece = new Queen(this.player);
+      }
     }
 
     this.player = this.player === 'white' ? 'black' : 'white';
