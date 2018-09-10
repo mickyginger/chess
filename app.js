@@ -213,15 +213,13 @@ class Board {
     const squareFrom = this.squares[indexFrom];
     const squareTo = this.squares[indexTo];
 
-    const playerInCheck = this.isPlayerInCheck();
-
     if(!this.canMove(squareFrom, squareTo)) return false;
 
     squareTo.piece = squareFrom.piece;
     delete squareFrom.piece;
 
-    if(playerInCheck && this.isPlayerInCheck()) {
-      // player is still in check, so undo the move
+    if(this.isPlayerInCheck()) {
+      // player is in check, so undo the move
       squareFrom.piece = squareTo.piece;
       delete squareTo.piece;
       return false;
@@ -254,8 +252,6 @@ class Board {
 
 // initialize board
 const board = new Board();
-board.move(1, 18);
-board.move(48, 40);
 
 let indexFrom = null;
 let indexTo = null;
