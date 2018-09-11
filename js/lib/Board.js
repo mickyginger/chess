@@ -109,7 +109,8 @@ class Board { // eslint-disable-line no-unused-vars
 
     if(move && move.restricted) {
       const attackingMove = squareTo.piece && squareTo.piece.color !== squareFrom.piece.color;
-      if(attackingMove && move.nonAttacking) return false;
+      if(move.nonAttacking && attackingMove) return false;
+      if(move.attackingOnly && !attackingMove) return false;
       return !!move;
     }
 
