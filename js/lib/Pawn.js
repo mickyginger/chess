@@ -6,6 +6,6 @@ class Pawn extends Piece { // eslint-disable-line no-unused-vars
       { row: color === 'white' ? 1 : -1, col: 1, restricted: true, attackingOnly: true },
       { row: color === 'white' ? 1 : -1, col: -1, restricted: true, attackingOnly: true },
       { row: color === 'white' ? 2 : -2, col: 0, firstMoveOnly: true, nonAttacking: true }
-    ]);
+    ])
   }
 }

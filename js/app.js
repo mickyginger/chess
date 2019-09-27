@@ -1,56 +1,56 @@
 /* global Board */
-const board = new Board();
+const board = new Board()
 
-let indexFrom = null;
-let indexTo = null;
-let $board = null;
-let $squares = null;
+let indexFrom = null
+let indexTo = null
+let $board = null
+let $squares = null
 
 function updateBoard() {
   board.squares.forEach((square, i) => {
-    const $square = $squares.eq(i);
-    $square.empty();
+    const $square = $squares.eq(i)
+    $square.empty()
 
     if(square.piece) {
       $square.append($('<i />', {
         class: `piece fas fa-chess-${square.piece.constructor.name.toLowerCase()} ${square.piece.color}`
-      }));
+      }))
     }
-  });
+  })
 }
 
 function movePiece(e) {
-  const $square = $(e.currentTarget);
-  const $piece = $square.find('.piece');
+  const $square = $(e.currentTarget)
+  const $piece = $square.find('.piece')
 
   if($piece.hasClass(board.player)) {
-    indexFrom = $square.index();
-    return false;
+    indexFrom = $square.index()
+    return false
   }
 
   if(indexFrom) {
-    indexTo = $square.index();
-    if(board.move(indexFrom, indexTo)) updateBoard();
+    indexTo = $square.index()
+    if(board.move(indexFrom, indexTo)) updateBoard()
   }
 }
 
 // link game to DOM
 function init() {
 
-  $board = $('.board');
+  $board = $('.board')
 
   // make the grid
   board.squares.forEach(square => {
-    const $square = $('<div />', { class: `square ${square.color}` });
+    const $square = $('<div />', { class: `square ${square.color}` })
     square.piece && $square.append($('<i />', {
       class: `piece fas fa-chess-${square.piece.constructor.name.toLowerCase()} ${square.piece.color}`
-    }));
-    $board.append($square);
-  });
+    }))
+    $board.append($square)
+  })
 
-  $squares = $board.find('.square');
+  $squares = $board.find('.square')
 
-  $board.on('click', '.square', movePiece);
+  $board.on('click', '.square', movePiece)
 }
 
-$(init);
+$(init)

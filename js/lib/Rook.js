@@ -6,6 +6,6 @@ class Rook extends Piece { // eslint-disable-line no-unused-vars
       { row: 0, col: -1 },
       { row: 1, col: 0 },
       { row: 0, col: 1 }
-    ]);
+    ])
   }
 }
